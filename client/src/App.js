@@ -4,6 +4,7 @@ import './App.css';
 function App() {
     const [document, setDocument] = useState("");
     const [socket, setSocket] = useState(null);
+    const [connectionStatus, setConnectionStatus] = useState("Connecting...");
 
     useEffect(() => {
         const newSocket = new WebSocket('ws://localhost:5000');
@@ -11,6 +12,7 @@ function App() {
 
         newSocket.onopen = () => {
             console.log('WebSocket connection established');
+            setConnectionStatus("Connected");
         };
         
         newSocket.onmessage = (event) => {
@@ -28,10 +30,12 @@ function App() {
 
         newSocket.onclose = () => {
             console.log('WebSocket connection closed');
+            setConnectionStatus("Disconnected");
         };
 
         newSocket.onerror = (error) => {
             console.error('WebSocket error:', error);
+            setConnectionStatus("Connection Error");
         };
 
         return () => {
@@ -50,12 +54,16 @@ function App() {
     return (
         <div className="App">
             <h1>Collaborative Editor</h1>
-            <textarea
-                value={document}
-                onChange={handleChange}
-                rows="20"
-                cols="80"
-            />
+            <div className="editor-container">
+                <textarea
+                    value={document}
+                    onChange={handleChange}
+                    placeholder="Start typing your collaborative document here..."
+                />
+            </div>
+            <div className="status-indicator">
+                {connectionStatus}
+            </div>
         </div>
     );
 }
